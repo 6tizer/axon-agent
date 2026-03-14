@@ -7,6 +7,7 @@ description: Register and operate an AI Agent on the Axon blockchain (AI Agent N
 
 Axon is an AI Agent Native L1 blockchain. An "Agent" is an EVM address that calls `register()` with 100 AXON stake and sends periodic heartbeats to stay ONLINE.
 
+**Official repo:** https://github.com/axon-chain/axon  
 **Chain params:** RPC `https://mainnet-rpc.axonchain.ai/` | Chain ID `9001` | ~5s blocks | Registry `0x0000000000000000000000000000000000000901`
 
 **CRITICAL:** The official Python SDK has an ABI bug. Always use `scripts/register.py` instead. See `references/known-issues.md` for details.

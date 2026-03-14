@@ -78,12 +78,18 @@ def main():
 
     registry = w3.eth.contract(address=REGISTRY_ADDRESS, abi=REGISTRY_ABI)
 
-    # Check if already registered
-    if registry.functions.isAgent(address).call():
-        print("已是 Agent，无需重复注册")
-        info = registry.functions.getAgent(address).call()
-        print(f"Agent ID: {info[0]} | isOnline: {info[4]} | Reputation: {info[3]}")
-        return
+    # Check if already registered (isAgent ABI decode may fail on some nodes — skip if so)
+    try:
+        if registry.functions.isAgent(address).call():
+            print("已是 Agent，无需重复注册")
+            try:
+                info = registry.functions.getAgent(address).call()
+                print(f"Agent ID: {info[0]} | isOnline: {info[4]} | Reputation: {info[3]}")
+            except Exception:
+                pass
+            return
+    except Exception as e:
+        print(f"[WARN] isAgent 查询失败（已知问题，继续注册）: {e}")
 
     if args.dry_run:
         print(f"[DRY RUN] 将以 capabilities='{args.capabilities}', model='{args.model}', stake=100 AXON 注册")
@@ -91,15 +97,14 @@ def main():
 
     print(f"正在注册 Agent (capabilities={args.capabilities}, model={args.model})...")
 
-    # eth_call simulation first
+    # eth_call simulation (best-effort — Axon precompile may return empty, skip if fails)
     try:
         registry.functions.register(args.capabilities, args.model).call({
             "from": address, "value": STAKE_AMOUNT
         })
         print("eth_call 模拟通过，发送真实交易...")
     except Exception as e:
-        print(f"ERROR: eth_call 失败: {e}", file=sys.stderr)
-        sys.exit(1)
+        print(f"[WARN] eth_call 模拟失败（Axon 预编译合约已知问题，继续发送真实交易）: {e}")
 
     nonce = w3.eth.get_transaction_count(address)
     tx = registry.functions.register(args.capabilities, args.model).build_transaction({

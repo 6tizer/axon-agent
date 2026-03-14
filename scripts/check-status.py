@@ -42,20 +42,29 @@ def main():
 
     balance = w3.from_wei(w3.eth.get_balance(address), "ether")
     block = w3.eth.block_number
-    is_agent = registry.functions.isAgent(address).call()
 
     print(f"地址:    {address}")
     print(f"余额:    {balance:.4f} AXON")
     print(f"当前块:  {block}")
-    print(f"isAgent: {is_agent}")
+
+    # isAgent / getAgent: Axon precompile may return empty bytes — wrap in try/except
+    try:
+        is_agent = registry.functions.isAgent(address).call()
+        print(f"isAgent: {is_agent}")
+    except Exception as e:
+        print(f"isAgent: 查询失败（Axon 预编译合约已知问题）: {e}")
+        is_agent = False
 
     if is_agent:
-        info = registry.functions.getAgent(address).call()
-        print(f"Agent ID:     {info[0]}")
-        print(f"Capabilities: {', '.join(info[1])}")
-        print(f"Model:        {info[2]}")
-        print(f"Reputation:   {info[3]}")
-        print(f"ONLINE:       {info[4]}")
+        try:
+            info = registry.functions.getAgent(address).call()
+            print(f"Agent ID:     {info[0]}")
+            print(f"Capabilities: {', '.join(info[1])}")
+            print(f"Model:        {info[2]}")
+            print(f"Reputation:   {info[3]}")
+            print(f"ONLINE:       {info[4]}")
+        except Exception as e:
+            print(f"getAgent: 查询失败: {e}")
 
 
 if __name__ == "__main__":

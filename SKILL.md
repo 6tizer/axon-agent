@@ -15,7 +15,7 @@ Axon is an AI Agent Native L1 blockchain. An "Agent" is an EVM address that call
 
 ## Prerequisites
 
-- Server with Python 3.8+ and Go 1.21+ (Tokyo server: `ssh -i ~/Downloads/QQClaw.pem root@100.70.102.60`)
+- Server with Python 3.8+ and Go 1.21+
 - EVM wallet private key saved to a file (e.g. `/opt/axon/private_key.txt`, chmod 600)
 - Minimum 120 AXON balance (100 stake + 20 burn + gas buffer)
 - `web3` Python package: `pip install web3`
@@ -85,12 +85,12 @@ Expected: `heartbeat confirmed` every ~720 blocks (~1 hour).
 ## Phase 4: Watchdog Cron
 
 ```bash
-# Copy watchdog to server
-scp scripts/watchdog.sh root@100.70.102.60:/opt/axon/watchdog.sh
-ssh root@100.70.102.60 "chmod +x /opt/axon/watchdog.sh"
+# Copy watchdog to your server (replace YOUR_SERVER and YOUR_KEY)
+scp scripts/watchdog.sh user@YOUR_SERVER:/opt/axon/watchdog.sh
+ssh user@YOUR_SERVER "chmod +x /opt/axon/watchdog.sh"
 
 # Add cron (every 5 min)
-ssh root@100.70.102.60 "(crontab -l 2>/dev/null; echo '*/5 * * * * /opt/axon/watchdog.sh') | crontab -"
+ssh user@YOUR_SERVER "(crontab -l 2>/dev/null; echo '*/5 * * * * /opt/axon/watchdog.sh') | crontab -"
 ```
 
 ---
